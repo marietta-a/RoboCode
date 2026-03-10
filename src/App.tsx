@@ -60,12 +60,22 @@ const COMMAND_DEFS: { type: CommandType; label: string; icon: React.ReactNode; c
   { type: 'CALL_FUNCTION', label: 'Do "The Dance"', icon: <Zap className="w-4 h-4" />, color: 'bg-pink-500' },
 ];
 
+const BIOMES = [
+  { color: 'bg-purple-900/20', label: 'Cosmic Core', icon: '🚀', seed: 'space' },
+  { color: 'bg-indigo-500/10', label: 'Cloud Peaks', icon: '☁️', seed: 'mountain' },
+  { color: 'bg-amber-500/10', label: 'Silicon Desert', icon: '🏜️', seed: 'desert' },
+  { color: 'bg-blue-500/10', label: 'Data Ocean', icon: '🌊', seed: 'ocean' },
+  { color: 'bg-emerald-500/10', label: 'Circuit Jungle', icon: '🌿', seed: 'jungle' },
+];
+
 export default function App() {
   const [phase, setPhase] = useState<GamePhase>('QUEST_MAP');
   const [unlockedLevels, setUnlockedLevels] = useState<number[]>([1]);
   const [levelIdx, setLevelIdx] = useState(0);
   const currentLevel = LEVELS[levelIdx];
   
+  const currentBiome = BIOMES[Math.floor((LEVELS.length - 1 - levelIdx) / 10)];
+
   const [robotColor, setRobotColor] = useState('bg-blue-600');
   const [robotAccessory, setRobotAccessory] = useState<string | null>(null);
   const [totalScore, setTotalScore] = useState(0);
@@ -532,7 +542,7 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-slate-50">
+    <div className="min-h-screen flex flex-col bg-gradient-to-b from-[#87CEEB] via-[#E0F2FE] to-[#BAE6FD]">
       {/* Header */}
       <header className="bg-white border-b border-slate-200 px-6 py-4 flex items-center justify-between">
         <div className="flex items-center gap-3">
@@ -572,7 +582,18 @@ export default function App() {
 
       <AnimatePresence mode="wait">
         {phase === 'CUSTOMIZING' && (
-          <div className="flex-1 flex flex-col overflow-y-auto">
+          <div className="flex-1 flex flex-col overflow-y-auto relative">
+            {/* Biome Background */}
+            <div className="absolute inset-0 pointer-events-none overflow-hidden">
+              <div className={cn("absolute inset-0 transition-colors duration-1000", BIOMES[4].color)}>
+                <img 
+                  src={`https://picsum.photos/seed/${BIOMES[4].seed}/1200/800`}
+                  alt=""
+                  className="absolute inset-0 w-full h-full object-cover opacity-10 mix-blend-overlay"
+                  referrerPolicy="no-referrer"
+                />
+              </div>
+            </div>
             <RobotCustomizer 
               robotColor={robotColor}
               setRobotColor={setRobotColor}
@@ -598,7 +619,23 @@ export default function App() {
           </div>
         )}
         {(phase === 'PLAYING' || phase === 'PAUSED' || phase === 'SUCCESS' || phase === 'FAILED') && (
-          <div className="flex-1 flex flex-col overflow-hidden">
+          <div className="flex-1 flex flex-col overflow-hidden relative">
+            {/* Biome Background */}
+            <div className="absolute inset-0 pointer-events-none overflow-hidden">
+              <div className={cn("absolute inset-0 transition-colors duration-1000", currentBiome.color)}>
+                <img 
+                  src={`https://picsum.photos/seed/${currentBiome.seed}/1200/800`}
+                  alt=""
+                  className="absolute inset-0 w-full h-full object-cover opacity-10 mix-blend-overlay"
+                  referrerPolicy="no-referrer"
+                />
+                <div className="flex flex-col items-center justify-center h-full opacity-5 select-none">
+                  <span className="text-[20rem] mb-4">{currentBiome.icon}</span>
+                  <span className="text-9xl font-black uppercase tracking-widest">{currentBiome.label}</span>
+                </div>
+              </div>
+            </div>
+
             <GamePlay 
               currentLevel={currentLevel}
               robot={robot}

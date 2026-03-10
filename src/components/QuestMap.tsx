@@ -61,16 +61,15 @@ export const QuestMap: React.FC<QuestMapProps> = ({
     for (let i = 1; i < levelPositions.length; i++) {
       const prev = levelPositions[i - 1];
       const curr = levelPositions[i];
-      // Use quadratic curves for smoothness
-      const cpX = (prev.x + curr.x) / 2 + 200;
-      const cpY = (prev.y + curr.y) / 2 + 50;
-      d += ` Q ${prev.x + 200} ${curr.y + 50}, ${curr.x + 200} ${curr.y + 50}`;
+      // Use a smooth curve between points
+      const midY = (prev.y + curr.y) / 2 + 50;
+      d += ` C ${prev.x + 200} ${midY}, ${curr.x + 200} ${midY}, ${curr.x + 200} ${curr.y + 50}`;
     }
     return d;
   }, [levelPositions]);
 
   return (
-    <div className="flex flex-col w-full h-screen bg-gradient-to-b from-[#87CEEB] via-[#E0F2FE] to-[#BAE6FD] overflow-hidden">
+    <div className="flex flex-col w-full h-screen overflow-hidden">
       {/* Header - Static */}
       <div className="flex-none z-50 w-full bg-white/90 backdrop-blur-md border-b border-blue-200 p-4 flex items-center justify-between px-8 shadow-sm">
         <button
@@ -95,7 +94,73 @@ export const QuestMap: React.FC<QuestMapProps> = ({
         ref={scrollContainerRef}
         className="flex-1 overflow-y-auto overflow-x-hidden relative pb-48"
       >
-        <div className="flex flex-col items-center w-full">
+        {/* Biome Backgrounds */}
+        <div className="absolute inset-0 pointer-events-none">
+          {[
+            { color: 'bg-emerald-500/10', label: 'Circuit Jungle', icon: '🌿', y: 4, seed: 'jungle' },
+            { color: 'bg-blue-500/10', label: 'Data Ocean', icon: '🌊', y: 3, seed: 'ocean' },
+            { color: 'bg-amber-500/10', label: 'Silicon Desert', icon: '🏜️', y: 2, seed: 'desert' },
+            { color: 'bg-indigo-500/10', label: 'Cloud Peaks', icon: '☁️', y: 1, seed: 'mountain' },
+            { color: 'bg-purple-900/20', label: 'Cosmic Core', icon: '🚀', y: 0, seed: 'space' },
+          ].map((biome, i) => (
+            <div 
+              key={i}
+              className={cn("absolute w-full flex items-center justify-center overflow-hidden", biome.color)}
+              style={{ 
+                height: `${10 * 140}px`, 
+                top: `${biome.y * 10 * 140}px`,
+                borderTop: '2px dashed rgba(255,255,255,0.2)'
+              }}
+            >
+              <img 
+                src={`https://picsum.photos/seed/${biome.seed}/1200/800`}
+                alt=""
+                className="absolute inset-0 w-full h-full object-cover opacity-10 mix-blend-overlay"
+                referrerPolicy="no-referrer"
+              />
+              <div className="flex flex-col items-center opacity-20 select-none relative z-0">
+                <span className="text-9xl mb-4 drop-shadow-2xl">{biome.icon}</span>
+                <span className="text-6xl font-black uppercase tracking-widest drop-shadow-lg">{biome.label}</span>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <div className="flex flex-col items-center w-full relative">
+          {/* Fun Landmarks */}
+          <div className="absolute inset-0 pointer-events-none">
+            {[
+              { icon: '🤖', x: -180, y: 5, scale: 1.5, rotate: 10 },
+              { icon: '💾', x: 180, y: 15, scale: 1.2, rotate: -15 },
+              { icon: '⚡', x: -150, y: 25, scale: 2, rotate: 5 },
+              { icon: '🛰️', x: 160, y: 35, scale: 1.8, rotate: 20 },
+              { icon: '🛸', x: -190, y: 45, scale: 2.5, rotate: -10 },
+            ].map((landmark, i) => (
+              <motion.div
+                key={i}
+                initial={{ opacity: 0 }}
+                whileInView={{ opacity: 0.4 }}
+                animate={{ 
+                  y: [0, -20, 0],
+                  rotate: [landmark.rotate, landmark.rotate + 10, landmark.rotate]
+                }}
+                transition={{ 
+                  duration: 4 + Math.random() * 2,
+                  repeat: Infinity,
+                  ease: "easeInOut"
+                }}
+                className="absolute text-6xl"
+                style={{ 
+                  left: `calc(50% + ${landmark.x}px)`,
+                  top: `${(levels.length - 1 - landmark.y) * 140}px`,
+                  transform: `scale(${landmark.scale})`
+                }}
+              >
+                {landmark.icon}
+              </motion.div>
+            ))}
+          </div>
+
           <div className="relative mt-24 mb-24" style={{ height: levelPositions.length * 140 + 100 }}>
             {/* Path SVG */}
             <svg 

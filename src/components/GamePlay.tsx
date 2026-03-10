@@ -164,7 +164,7 @@ export const GamePlay: React.FC<GamePlayProps> = ({
       {/* Left Column: Grid & Status */}
       <div className="col-span-7 flex flex-col gap-4 lg:gap-6 h-full overflow-y-auto pr-2 custom-scrollbar">
         {/* Grid Area */}
-        <div className="bg-white rounded-[32px] border border-slate-200 shadow-sm p-4 lg:p-8 flex flex-col items-center justify-center relative min-h-[300px] lg:min-h-[500px]">
+        <div className="bg-white/80 backdrop-blur-md rounded-[32px] border border-slate-200 shadow-sm p-4 lg:p-8 flex flex-col items-center justify-center relative min-h-[300px] lg:min-h-[500px]">
            <div className="absolute top-6 left-8 flex items-center gap-3 text-slate-400 max-w-[80%]">
               <div className="w-6 h-6 rounded-full border border-slate-200 flex items-center justify-center shrink-0">
                 <Info className="w-3.5 h-3.5" />
@@ -240,11 +240,11 @@ export const GamePlay: React.FC<GamePlayProps> = ({
         {/* Status & Score Row */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
           <div className={cn(
-            "p-6 rounded-[28px] border flex items-center gap-5 transition-all shadow-sm",
-            robot.status === 'IDLE' && "bg-white border-slate-100",
-            robot.status === 'RUNNING' && "bg-blue-50 border-blue-100 text-blue-700",
-            robot.status === 'CRASHED' && "bg-rose-50 border-rose-100 text-rose-700",
-            robot.status === 'SUCCESS' && "bg-emerald-50 border-emerald-100 text-emerald-700"
+            "p-6 rounded-[28px] border flex items-center gap-5 transition-all shadow-sm backdrop-blur-md",
+            robot.status === 'IDLE' && "bg-white/80 border-slate-100",
+            robot.status === 'RUNNING' && "bg-blue-50/80 border-blue-100 text-blue-700",
+            robot.status === 'CRASHED' && "bg-rose-50/80 border-rose-100 text-rose-700",
+            robot.status === 'SUCCESS' && "bg-emerald-50/80 border-emerald-100 text-emerald-700"
           )}>
             <div className={cn(
               "w-14 h-14 rounded-full flex items-center justify-center shrink-0 shadow-sm",
@@ -264,7 +264,7 @@ export const GamePlay: React.FC<GamePlayProps> = ({
             </div>
           </div>
 
-          <div className="bg-white border border-slate-100 p-6 rounded-[28px] flex items-center gap-5 shadow-sm">
+          <div className="bg-white/80 backdrop-blur-md border border-slate-100 p-6 rounded-[28px] flex items-center gap-5 shadow-sm">
             <div className="w-14 h-14 rounded-full bg-amber-50 flex items-center justify-center text-amber-500 shrink-0 shadow-sm">
               <Zap className="w-7 h-7 fill-current" />
             </div>
@@ -286,7 +286,7 @@ export const GamePlay: React.FC<GamePlayProps> = ({
       {/* Right Column: Editor */}
       <div className="col-span-5 flex flex-col gap-4 lg:gap-6 h-full overflow-hidden">
         {/* Controls */}
-        <div className="bg-white rounded-[32px] border border-slate-200 shadow-sm p-8 flex flex-col gap-8">
+        <div className="bg-white/80 backdrop-blur-md rounded-[32px] border border-slate-200 shadow-sm p-8 flex flex-col gap-8">
           <div className="flex items-center justify-between">
             <h2 className="text-xl font-black text-slate-900 tracking-tight">Command Palette</h2>
             <div className="flex gap-3">
@@ -371,7 +371,7 @@ export const GamePlay: React.FC<GamePlayProps> = ({
         </div>
 
         {/* Program Editor */}
-        <div className="bg-white rounded-[32px] border border-slate-200 shadow-sm p-8 flex-1 flex flex-col gap-6 overflow-hidden">
+        <div className="bg-white/80 backdrop-blur-md rounded-[32px] border border-slate-200 shadow-sm p-8 flex-1 flex flex-col gap-6 overflow-hidden">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               {editingFunction && (

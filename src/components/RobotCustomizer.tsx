@@ -29,7 +29,7 @@ export const RobotCustomizer: React.FC<RobotCustomizerProps> = ({
       <motion.div 
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="bg-white rounded-[40px] border border-slate-200 shadow-xl p-12 w-full flex flex-col items-center gap-12"
+        className="bg-white/80 backdrop-blur-md rounded-[40px] border border-slate-200 shadow-xl p-12 w-full flex flex-col items-center gap-12"
       >
         <div className="text-center space-y-2">
           <h2 className="text-4xl font-black text-slate-900 tracking-tight">Meet Your Robo!</h2>
