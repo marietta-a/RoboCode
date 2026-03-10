@@ -40,6 +40,7 @@ import {
   GameLevel,
   GamePhase
 } from './types';
+import { LevelManager } from './levels';
 import { RobotCustomizer } from './components/RobotCustomizer';
 import { QuestMap } from './components/QuestMap';
 import { GamePlay } from './components/GamePlay';
@@ -48,79 +49,7 @@ function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-const LEVELS: GameLevel[] = [
-  {
-    id: 1,
-    gridSize: 5,
-    startPos: { x: 0, y: 4 },
-    startDir: 'UP',
-    targetPos: { x: 4, y: 0 },
-    obstacles: [],
-    items: [{ x: 2, y: 2, id: 'battery' }],
-    description: "Help Robo reach the goal! Don't forget to pick up the battery on the way."
-  },
-  {
-    id: 2,
-    gridSize: 6,
-    startPos: { x: 0, y: 5 },
-    startDir: 'UP',
-    targetPos: { x: 5, y: 0 },
-    obstacles: [
-      { x: 1, y: 1 }, { x: 1, y: 2 }, { x: 1, y: 3 },
-      { x: 3, y: 3 }, { x: 3, y: 4 }, { x: 3, y: 5 }
-    ],
-    items: [],
-    description: "Navigate through the maze! Use your logic to find the path."
-  },
-  {
-    id: 3,
-    gridSize: 6,
-    startPos: { x: 0, y: 5 },
-    startDir: 'UP',
-    targetPos: { x: 5, y: 5 },
-    obstacles: [
-      { x: 2, y: 0 }, { x: 2, y: 1 }, { x: 2, y: 2 },
-      { x: 4, y: 3 }, { x: 4, y: 4 }, { x: 4, y: 5 }
-    ],
-    items: [
-      { x: 1, y: 1, id: 'b1' },
-      { x: 3, y: 3, id: 'b2' },
-      { x: 5, y: 1, id: 'b3' }
-    ],
-    description: "Collect all 3 energy cores to power up the exit!"
-  },
-  {
-    id: 4,
-    gridSize: 7,
-    startPos: { x: 0, y: 0 },
-    startDir: 'RIGHT',
-    targetPos: { x: 6, y: 6 },
-    obstacles: [
-      { x: 1, y: 0 }, { x: 1, y: 1 }, { x: 1, y: 2 }, { x: 1, y: 3 }, { x: 1, y: 4 }, { x: 1, y: 5 },
-      { x: 3, y: 1 }, { x: 3, y: 2 }, { x: 3, y: 3 }, { x: 3, y: 4 }, { x: 3, y: 5 }, { x: 3, y: 6 },
-      { x: 5, y: 0 }, { x: 5, y: 1 }, { x: 5, y: 2 }, { x: 5, y: 3 }, { x: 5, y: 4 }, { x: 5, y: 5 }
-    ],
-    items: [],
-    description: "The Great Zig-Zag! Can you find the way through the tight corridors?"
-  },
-  {
-    id: 5,
-    gridSize: 8,
-    startPos: { x: 0, y: 7 },
-    startDir: 'UP',
-    targetPos: { x: 7, y: 0 },
-    obstacles: [
-      { x: 2, y: 2 }, { x: 2, y: 3 }, { x: 2, y: 4 }, { x: 2, y: 5 },
-      { x: 5, y: 2 }, { x: 5, y: 3 }, { x: 5, y: 4 }, { x: 5, y: 5 },
-      { x: 3, y: 2 }, { x: 4, y: 2 }, { x: 3, y: 5 }, { x: 4, y: 5 }
-    ],
-    items: [
-      { x: 3, y: 3, id: 'core1' },
-      { x: 4, y: 4, id: 'core2' }
-    ],
-    description: "The Final Challenge! Collect the cores from the center of the fortress."
-  }
-];
+const LEVELS = LevelManager.getLevels();
 
 const COMMAND_DEFS: { type: CommandType; label: string; icon: React.ReactNode; color: string }[] = [
   { type: 'MOVE', label: 'Move Forward', icon: <ArrowUp className="w-4 h-4" />, color: 'bg-blue-500' },
@@ -224,7 +153,7 @@ export default function App() {
   }, [isPaused]);
 
   // Sound Effects using Web Audio API
-  const playSound = useCallback((type: 'action' | 'error' | 'success' | 'pickup') => {
+  const playSound = useCallback((type: 'action' | 'error' | 'success' | 'pickup' | 'start' | 'click') => {
     const ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
     const osc = ctx.createOscillator();
     const gain = ctx.createGain();
@@ -235,11 +164,12 @@ export default function App() {
     const now = ctx.currentTime;
 
     if (type === 'action') {
-      osc.type = 'sine';
-      osc.frequency.setValueAtTime(440, now);
-      osc.frequency.exponentialRampToValueAtTime(880, now + 0.1);
-      gain.gain.setValueAtTime(0.1, now);
-      gain.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
+      // Mechanical step sound
+      osc.type = 'square';
+      osc.frequency.setValueAtTime(150, now);
+      osc.frequency.exponentialRampToValueAtTime(40, now + 0.1);
+      gain.gain.setValueAtTime(0.05, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.1);
       osc.start(now);
       osc.stop(now + 0.1);
     } else if (type === 'error') {
@@ -272,6 +202,21 @@ export default function App() {
         o.start(now + i * 0.1);
         o.stop(now + i * 0.1 + 0.3);
       });
+    } else if (type === 'start') {
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(220, now);
+      osc.frequency.exponentialRampToValueAtTime(440, now + 0.2);
+      gain.gain.setValueAtTime(0.1, now);
+      gain.gain.exponentialRampToValueAtTime(0.01, now + 0.2);
+      osc.start(now);
+      osc.stop(now + 0.2);
+    } else if (type === 'click') {
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(1000, now);
+      gain.gain.setValueAtTime(0.05, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.05);
+      osc.start(now);
+      osc.stop(now + 0.05);
     }
   }, []);
 
@@ -296,6 +241,7 @@ export default function App() {
 
   const addCommand = (type: CommandType, funcName?: string) => {
     if (isExecuting) return;
+    playSound('click');
     const newCommand: Command = {
       id: Math.random().toString(36).substr(2, 9),
       type,
@@ -414,6 +360,7 @@ export default function App() {
   const runProgram = async () => {
     if (program.length === 0 || isExecuting) return;
     resetRobot();
+    playSound('start');
     
     runIdRef.current += 1;
     const currentRunId = runIdRef.current;
